@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CampusConnect</string>
+    <string name="title_add_student">Register Student</string>
+</resources>

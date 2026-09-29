@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: lab8
+  labels:
+    app: product-service
+    tier: backend
+    lab: "8"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+        tier: backend
+        lab: "8"
+    spec:
+      containers:
+        - name: product-service
+          image: ws-soapractical-product-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3002
+              name: http
+          envFrom:
+            - configMapRef:
+                name: campusconnect-config
+            - secretRef:
+                name: campusconnect-secret
+          env:
+            - name: PORT
+              value: "3002"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2

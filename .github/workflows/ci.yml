@@ -1,0 +1,75 @@
+name: CampusConnect CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build, Test & Validate Microservices
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js Runtime (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'microservices/api-gateway/package.json'
+
+      - name: 📦 Install Microservice Dependencies
+        run: |
+          echo "Installing dependencies for API Gateway..."
+          cd microservices/api-gateway && npm ci || npm install
+          cd ../user-service && npm ci || npm install
+          cd ../product-service && npm ci || npm install
+          cd ../order-service && npm ci || npm install
+          cd ../..
+
+      - name: 🧪 Run Automated Integration & Microservice Tests
+        run: |
+          node microservices/test-microservices.js
+
+      - name: ☸️ Validate Kubernetes Manifests (Dry-Run / Syntax)
+        run: |
+          echo "Validating k8s YAML manifests structure..."
+          python3 -c "
+          import yaml, glob
+          files = glob.glob('k8s/*.yaml') + glob.glob('k8s/monitoring/*.yaml')
+          for f in files:
+              try:
+                  with open(f, 'r') as stream:
+                      list(yaml.safe_load_all(stream))
+                  print(f'✅ {f} - Valid YAML syntax')
+              except Exception as e:
+                  print(f'❌ {f} - Invalid: {e}')
+                  exit(1)
+          "
+
+      - name: 🐳 Build Docker Images (Multi-Service)
+        run: |
+          echo "Building API Gateway Docker image..."
+          docker build -t campusconnect-api-gateway:${{ github.sha }} ./microservices/api-gateway
+
+          echo "Building User Service Docker image..."
+          docker build -t campusconnect-user-service:${{ github.sha }} ./microservices/user-service
+
+          echo "Building Product Service Docker image..."
+          docker build -t campusconnect-product-service:${{ github.sha }} ./microservices/product-service
+
+          echo "Building Order Service Docker image..."
+          docker build -t campusconnect-order-service:${{ github.sha }} ./microservices/order-service
+
+      - name: 📊 Summary Report
+        run: |
+          echo "================================================="
+          echo " CampusConnect CI Pipeline Passed Successfully!  "
+          echo " Git Commit: ${{ github.sha }}                   "
+          echo " Images Built: Gateway, User, Product, Order     "
+          echo " K8s Manifests: Validated                        "
+          echo "================================================="

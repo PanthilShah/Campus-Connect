@@ -1,0 +1,53 @@
+# Alias for compose.yaml
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./student-api
+      dockerfile: Dockerfile
+    container_name: student-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/campusconnect
+    depends_on:
+      - mongodb
+    networks:
+      - student-network
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - student-mongo-data:/data/db
+    networks:
+      - student-network
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./student-client
+      dockerfile: Dockerfile
+    container_name: student-client
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - student-network
+    restart: unless-stopped
+
+volumes:
+  student-mongo-data:
+    name: student-mongo-data
+
+networks:
+  student-network:
+    name: student-network
+    driver: bridge

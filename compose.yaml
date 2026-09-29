@@ -1,0 +1,61 @@
+# Docker Compose Specification for Lab 5
+# Web Services & SOA Laboratory - Dhirubhai Ambani University
+# Student: Panthil Shah (MScIT-25-0XX)
+
+version: '3.8'
+
+services:
+  # 1. Student REST API Service (Node.js / Express)
+  api:
+    build:
+      context: ./student-api
+      dockerfile: Dockerfile
+    container_name: student-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/campusconnect
+    depends_on:
+      - mongodb
+    networks:
+      - student-network
+    restart: unless-stopped
+
+  # 2. Database Service (MongoDB Container)
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - student-mongo-data:/data/db
+    networks:
+      - student-network
+    restart: unless-stopped
+
+  # 3. React Web Client (Optional Full-Stack Service)
+  client:
+    build:
+      context: ./student-client
+      dockerfile: Dockerfile
+    container_name: student-client
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - student-network
+    restart: unless-stopped
+
+# Named volume for database persistence outside container lifecycle
+volumes:
+  student-mongo-data:
+    name: student-mongo-data
+
+# Isolated bridge network for inter-container communication
+networks:
+  student-network:
+    name: student-network
+    driver: bridge

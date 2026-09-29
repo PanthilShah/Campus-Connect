@@ -1,0 +1,315 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CampusConnect Student Management REST API",
+    "version": "1.0.0",
+    "description": "RESTful Web Service for Student Management built for Web Services & SOA Laboratory (Lab 3) — Dhirubhai Ambani University (formerly DA-IICT), Gandhinagar.",
+    "contact": {
+      "name": "Panthil Shah",
+      "email": "mscit250xx@dau.ac.in"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Express.js Development Server"
+    },
+    {
+      "url": "http://localhost:8080",
+      "description": "Local Spring Boot Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Students",
+      "description": "CRUD operations for Student records"
+    }
+  ],
+  "paths": {
+    "/students": {
+      "get": {
+        "tags": ["Students"],
+        "summary": "List all students",
+        "description": "Retrieves the complete list of registered students.",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved student list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "count": { "type": "integer", "example": 4 },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Student" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Students"],
+        "summary": "Create a new student",
+        "description": "Adds a new student record to the repository. Validates name, email, course, and semester.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/StudentInput" },
+              "example": {
+                "name": "Panthil Shah",
+                "email": "panthil.shah@dau.ac.in",
+                "course": "M.Sc. Information Technology",
+                "semester": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Student created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Student created successfully" },
+                    "data": { "$ref": "#/components/schemas/Student" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation failure (invalid email, missing fields, invalid semester)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{id}": {
+      "get": {
+        "tags": ["Students"],
+        "summary": "Get a student by ID",
+        "description": "Returns a single student record matching the provided ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Student ID or Roll Number",
+            "schema": { "type": "string", "example": "MScIT-25-001" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/Student" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Student not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Students"],
+        "summary": "Update a student record",
+        "description": "Updates an existing student's details by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Student ID to update",
+            "schema": { "type": "string", "example": "MScIT-25-001" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/StudentInput" },
+              "example": {
+                "name": "Panthil Shah",
+                "email": "panthil.shah@dau.ac.in",
+                "course": "M.Sc. Information Technology",
+                "semester": 4
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Student updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Student updated successfully" },
+                    "data": { "$ref": "#/components/schemas/Student" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Student not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Students"],
+        "summary": "Delete a student record",
+        "description": "Removes a student record from the repository by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Student ID to delete",
+            "schema": { "type": "string", "example": "MScIT-25-001" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Student with ID MScIT-25-001 deleted successfully" },
+                    "deleted": { "$ref": "#/components/schemas/Student" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Student not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Student": {
+        "type": "object",
+        "required": ["id", "name", "email", "course", "semester"],
+        "properties": {
+          "id": { "type": "string", "example": "MScIT-25-001" },
+          "name": { "type": "string", "example": "Panthil Shah" },
+          "email": { "type": "string", "format": "email", "example": "panthil.shah@dau.ac.in" },
+          "course": { "type": "string", "example": "M.Sc. Information Technology" },
+          "semester": { "type": "integer", "minimum": 1, "maximum": 8, "example": 3 },
+          "createdAt": { "type": "string", "format": "date-time", "example": "2026-09-29T10:00:00.000Z" }
+        }
+      },
+      "StudentInput": {
+        "type": "object",
+        "required": ["name", "email", "course", "semester"],
+        "properties": {
+          "id": { "type": "string", "description": "Optional custom ID (auto-generated if omitted)", "example": "MScIT-25-005" },
+          "name": { "type": "string", "example": "Aanya Verma" },
+          "email": { "type": "string", "format": "email", "example": "aanya.verma@dau.ac.in" },
+          "course": { "type": "string", "example": "M.Sc. Information Technology" },
+          "semester": { "type": "integer", "minimum": 1, "maximum": 8, "example": 3 }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "error": { "type": "string", "example": "Student not found with ID: MScIT-25-999" }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "error": { "type": "string", "example": "Validation Failed" },
+          "details": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": [
+              "Name is required and cannot be empty",
+              "Valid email address is required (e.g. user@dau.ac.in)",
+              "Semester must be a positive integer between 1 and 8"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

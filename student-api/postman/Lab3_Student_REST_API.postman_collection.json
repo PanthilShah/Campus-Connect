@@ -1,0 +1,156 @@
+{
+	"info": {
+		"_postman_id": "c1f72a48-6d24-46b5-901c-22538dc3e791",
+		"name": "RESTful Web Services – Lab 3",
+		"description": "Postman Collection for Web Services & SOA Laboratory - Lab 3 (Student REST API). Contains test assertions for all CRUD endpoints and validation error cases.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. GET All Students (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/students",
+					"host": ["{{baseUrl}}"],
+					"path": ["students"]
+				},
+				"description": "Retrieves list of all registered students."
+			},
+			"response": []
+		},
+		{
+			"name": "2. GET Student by ID - Panthil Shah (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/students/MScIT-25-001",
+					"host": ["{{baseUrl}}"],
+					"path": ["students", "MScIT-25-001"]
+				},
+				"description": "Fetches a specific student record by their Roll Number / ID."
+			},
+			"response": []
+		},
+		{
+			"name": "3. GET Student by Invalid ID (404 Not Found)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/students/INVALID-ID-999",
+					"host": ["{{baseUrl}}"],
+					"path": ["students", "INVALID-ID-999"]
+				},
+				"description": "Tests 404 Not Found response when requested student ID does not exist."
+			},
+			"response": []
+		},
+		{
+			"name": "4. POST Create Student (201 Created)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Tanvi Patel\",\n  \"email\": \"tanvi.patel@dau.ac.in\",\n  \"course\": \"M.Sc. Information Technology\",\n  \"semester\": 3\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/students",
+					"host": ["{{baseUrl}}"],
+					"path": ["students"]
+				},
+				"description": "Creates a new student record with valid attributes."
+			},
+			"response": []
+		},
+		{
+			"name": "5. POST Invalid Student Body (400 Bad Request)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"\",\n  \"email\": \"invalid-email\",\n  \"course\": \"M.Sc. IT\",\n  \"semester\": -2\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/students",
+					"host": ["{{baseUrl}}"],
+					"path": ["students"]
+				},
+				"description": "Tests input validation rejection with HTTP 400 and structured error response."
+			},
+			"response": []
+		},
+		{
+			"name": "6. PUT Update Student (200 OK)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Panthil Shah\",\n  \"email\": \"panthil.shah@dau.ac.in\",\n  \"course\": \"M.Sc. Information Technology\",\n  \"semester\": 4\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/students/MScIT-25-001",
+					"host": ["{{baseUrl}}"],
+					"path": ["students", "MScIT-25-001"]
+				},
+				"description": "Updates an existing student record."
+			},
+			"response": []
+		},
+		{
+			"name": "7. DELETE Student (200 OK)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/students/MScIT-25-003",
+					"host": ["{{baseUrl}}"],
+					"path": ["students", "MScIT-25-003"]
+				},
+				"description": "Deletes a student record by ID."
+			},
+			"response": []
+		},
+		{
+			"name": "8. GET Swagger UI Documentation (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api-docs/",
+					"host": ["{{baseUrl}}"],
+					"path": ["api-docs", ""]
+				},
+				"description": "Fetches the interactive Swagger UI documentation page."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

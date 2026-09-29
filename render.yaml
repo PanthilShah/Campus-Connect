@@ -1,0 +1,77 @@
+# render.yaml — Cloud Deployment Configuration for Render.com
+# Lab 7 — Part C: Cloud Deployment
+# Web Services & SOA Laboratory — Dhirubhai Ambani University
+#
+# Deploy with:  Connect this GitHub repo to https://render.com → New → Blueprint
+#
+# Architecture on Render (free tier):
+#   campus-api-gateway   (public, port 10000) — single public entry point
+#   campus-user-service  (internal)
+#   campus-product-service (internal)
+#   campus-order-service (internal)
+#
+# All inter-service communication uses Render internal hostnames:
+#   http://<service-name>:10000  (Render assigns port 10000 by default for web services)
+
+version: "1"
+
+services:
+
+  # ── API Gateway (Public) ────────────────────────────────────────────────
+  - type: web
+    name: campus-api-gateway
+    env: docker
+    dockerfilePath: ./microservices/api-gateway/Dockerfile
+    dockerContext: ./microservices/api-gateway
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 10000
+      # Config-based service discovery — change these to reroute without code edits
+      - key: USER_SERVICE_URL
+        value: http://campus-user-service:10000
+      - key: PRODUCT_SERVICE_URL
+        value: http://campus-product-service:10000
+      - key: ORDER_SERVICE_URL
+        value: http://campus-order-service:10000
+
+  # ── User Service (Internal Web Service) ────────────────────────────────
+  - type: web
+    name: campus-user-service
+    env: docker
+    dockerfilePath: ./microservices/user-service/Dockerfile
+    dockerContext: ./microservices/user-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 10000
+
+  # ── Product Service (Internal Web Service) ─────────────────────────────
+  - type: web
+    name: campus-product-service
+    env: docker
+    dockerfilePath: ./microservices/product-service/Dockerfile
+    dockerContext: ./microservices/product-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 10000
+
+  # ── Order Service (Internal Web Service) ───────────────────────────────
+  - type: web
+    name: campus-order-service
+    env: docker
+    dockerfilePath: ./microservices/order-service/Dockerfile
+    dockerContext: ./microservices/order-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: USER_SERVICE_URL
+        value: http://campus-user-service:10000
+      - key: PRODUCT_SERVICE_URL
+        value: http://campus-product-service:10000

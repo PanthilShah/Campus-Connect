@@ -1,0 +1,170 @@
+{
+	"info": {
+		"_postman_id": "f83a28b1-591a-4710-86b2-659f42918809",
+		"name": "Microservices – Lab 6",
+		"description": "Postman Collection for Web Services & SOA Laboratory - Lab 6 (Decomposing and Running Backend as Independent Services). Covers direct service calls, Gateway routing, and inter-service communication.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. User Service",
+			"item": [
+				{
+					"name": "GET /users (List All Users)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3001/users" }
+					}
+				},
+				{
+					"name": "GET /users/101 (Panthil Shah)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3001/users/101" }
+					}
+				},
+				{
+					"name": "POST /users (Create User)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Tanvi Patel\",\n  \"email\": \"tanvi.patel@dau.ac.in\",\n  \"role\": \"Student\",\n  \"department\": \"M.Sc. Information Technology\"\n}"
+						},
+						"url": { "raw": "http://localhost:3001/users" }
+					}
+				},
+				{
+					"name": "GET /users/999 (404 Not Found)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3001/users/999" }
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Product Service",
+			"item": [
+				{
+					"name": "GET /products (List All Courses)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3002/products" }
+					}
+				},
+				{
+					"name": "GET /products/501 (IT644 Course)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3002/products/501" }
+					}
+				},
+				{
+					"name": "POST /products (Create Course)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"IT680\",\n  \"name\": \"Advanced Distributed Systems\",\n  \"credits\": 4,\n  \"fee\": 45000\n}"
+						},
+						"url": { "raw": "http://localhost:3002/products" }
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Order Service (Inter-Service Communication)",
+			"item": [
+				{
+					"name": "GET /orders (List All Orders)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3003/orders" }
+					}
+				},
+				{
+					"name": "POST /orders (Valid: Calls User + Product Services)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"101\",\n  \"productId\": \"501\",\n  \"paymentMode\": \"Online Portal\"\n}"
+						},
+						"url": { "raw": "http://localhost:3003/orders" }
+					}
+				},
+				{
+					"name": "POST /orders (Invalid User 999 -> 404 Failure)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"999\",\n  \"productId\": \"501\"\n}"
+						},
+						"url": { "raw": "http://localhost:3003/orders" }
+					}
+				},
+				{
+					"name": "POST /orders (Invalid Product 999 -> 404 Failure)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"101\",\n  \"productId\": \"999\"\n}"
+						},
+						"url": { "raw": "http://localhost:3003/orders" }
+					}
+				}
+			]
+		},
+		{
+			"name": "4. API Gateway (Port 3000)",
+			"item": [
+				{
+					"name": "Gateway Discovery",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3000/" }
+					}
+				},
+				{
+					"name": "Gateway -> GET /users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3000/users" }
+					}
+				},
+				{
+					"name": "Gateway -> GET /products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3000/products" }
+					}
+				},
+				{
+					"name": "Gateway -> GET /orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "http://localhost:3000/orders" }
+					}
+				}
+			]
+		}
+	]
+}
